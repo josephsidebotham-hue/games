@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Word Play! 🎈</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,6 +28,7 @@
     html, body {
       height: 100%;
       overflow-x: hidden;
+      overscroll-behavior: none;
     }
 
     body {
@@ -41,6 +42,8 @@
       color: var(--ink);
       padding: 20px;
       user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -75,6 +78,50 @@
       margin: 0 auto;
       position: relative;
       z-index: 1;
+    }
+
+    /* Home button — back to game hub */
+    .home-btn {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      z-index: 50;
+      width: 52px;
+      height: 52px;
+      border: none;
+      background: white;
+      color: var(--ink);
+      border-radius: 16px;
+      cursor: pointer;
+      font-size: 1.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 0 #D5D2C7, 0 6px 14px rgba(45, 42, 74, 0.15);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      text-decoration: none;
+    }
+
+    .home-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #D5D2C7, 0 3px 8px rgba(45, 42, 74, 0.18);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .home-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 0 #D5D2C7, 0 8px 18px rgba(45, 42, 74, 0.2);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .home-btn {
+        top: 12px;
+        left: 12px;
+        width: 46px;
+        height: 46px;
+        font-size: 1.4rem;
+      }
     }
 
     header {
@@ -527,6 +574,89 @@
       font-weight: 500;
     }
 
+    /* Reward banner — appears when all cards have been flipped */
+    .reward-banner {
+      position: fixed;
+      top: 88px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-30px) scale(0.85);
+      opacity: 0;
+      z-index: 60;
+      pointer-events: none;
+      background: linear-gradient(135deg, #FFD93D 0%, #FF9F45 50%, #FF6B6B 100%);
+      color: white;
+      font-family: 'Baloo 2', sans-serif;
+      padding: 18px 28px;
+      border-radius: 24px;
+      box-shadow: 0 8px 0 rgba(199, 62, 92, 0.3), 0 16px 40px rgba(255, 107, 107, 0.5);
+      text-align: center;
+      max-width: calc(100% - 32px);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      transition: opacity 0.3s ease;
+    }
+
+    .reward-banner.visible {
+      opacity: 1;
+      animation: reward-bounce 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes reward-bounce {
+      0% { transform: translateX(-50%) translateY(-80px) scale(0.5); }
+      60% { transform: translateX(-50%) translateY(8px) scale(1.08); }
+      100% { transform: translateX(-50%) translateY(0) scale(1); }
+    }
+
+    .reward-main {
+      font-size: clamp(1.3rem, 4vw, 1.8rem);
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .reward-sub {
+      font-size: clamp(0.9rem, 2.5vw, 1.05rem);
+      font-weight: 600;
+      margin-top: 6px;
+      opacity: 0.95;
+    }
+
+    /* Flashing celebration on the New Cards button */
+    .shuffle-btn.celebrate {
+      animation: button-celebrate 0.8s ease-in-out infinite;
+    }
+
+    @keyframes button-celebrate {
+      0%, 100% {
+        transform: scale(1) rotate(0);
+        box-shadow: 0 6px 0 #C73E5C, 0 8px 16px rgba(199, 62, 92, 0.3);
+      }
+      50% {
+        transform: scale(1.1) rotate(-3deg);
+        box-shadow: 0 8px 0 #C73E5C, 0 14px 32px rgba(255, 217, 61, 0.8);
+      }
+    }
+
+    /* Confetti — flies down from top */
+    .confetti {
+      position: fixed;
+      top: -40px;
+      pointer-events: none;
+      z-index: 70;
+      animation: confetti-fall 3s linear forwards;
+      will-change: transform;
+    }
+
+    @keyframes confetti-fall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    @media (max-width: 600px) {
+      .reward-banner {
+        top: 70px;
+        padding: 14px 20px;
+      }
+    }
+
     /* Mobile adjustments */
     @media (max-width: 600px) {
       body { padding: 12px; }
@@ -543,6 +673,8 @@
   </style>
 </head>
 <body>
+  <a href="./" class="home-btn" aria-label="Back to games menu" title="Home">🏠</a>
+
   <div class="app">
     <header>
       <h1>Word Play!</h1>
@@ -580,6 +712,11 @@
     </div>
 
     <div class="grid" id="grid"></div>
+
+    <div class="reward-banner" id="rewardBanner" aria-hidden="true">
+      <div class="reward-main">🎉 You got them all! 🎉</div>
+      <div class="reward-sub">Tap 🎲 New Cards to play again!</div>
+    </div>
 
     <p class="footer-note">Made with 💛 for little learners</p>
   </div>
@@ -663,8 +800,11 @@
       cards: []
     };
 
+    let rewardShown = false;
+
     const grid = document.getElementById('grid');
     const shuffleBtn = document.getElementById('shuffleBtn');
+    const rewardBanner = document.getElementById('rewardBanner');
 
     // ============ Speech ============
     let voicesReady = false;
@@ -718,6 +858,8 @@
     }
 
     function renderCards() {
+      hideReward();
+      rewardShown = false;
       grid.innerHTML = '';
       grid.classList.toggle('word-mode', state.mode === 'word');
 
@@ -759,10 +901,50 @@
 
     // ============ Interactions ============
     function handleCardClick(e, wrap, card, item) {
+      const wasUnlocked = wrap.classList.contains('unlocked');
       card.classList.toggle('flipped');
       wrap.classList.add('unlocked');
-      speak(item.word);
       spawnSparkles(wrap, e);
+
+      // Check if this click finished the set
+      const justFinished = !rewardShown && !wasUnlocked && checkAllFlipped();
+
+      if (justFinished) {
+        rewardShown = true;
+        showReward();
+        speakWordThenCelebrate(item.word);
+      } else {
+        speak(item.word);
+      }
+    }
+
+    function checkAllFlipped() {
+      const all = document.querySelectorAll('.card-wrap');
+      const unlocked = document.querySelectorAll('.card-wrap.unlocked');
+      return all.length > 0 && unlocked.length === all.length;
+    }
+
+    function speakWordThenCelebrate(word) {
+      if (!('speechSynthesis' in window)) return;
+      speechSynthesis.cancel();
+      const wordUtter = new SpeechSynthesisUtterance(word.toLowerCase());
+      wordUtter.rate = 0.85;
+      wordUtter.pitch = 1.15;
+      wordUtter.volume = 1;
+      if (preferredVoice) wordUtter.voice = preferredVoice;
+
+      wordUtter.onend = () => {
+        const phrases = ['Great job!', 'You did it!', 'Awesome!', 'Way to go!', 'Amazing!'];
+        const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+        const cheerUtter = new SpeechSynthesisUtterance(phrase);
+        cheerUtter.rate = 0.95;
+        cheerUtter.pitch = 1.3;
+        cheerUtter.volume = 1;
+        if (preferredVoice) cheerUtter.voice = preferredVoice;
+        setTimeout(() => speechSynthesis.speak(cheerUtter), 250);
+      };
+
+      setTimeout(() => speechSynthesis.speak(wordUtter), 50);
     }
 
     function spawnSparkles(wrap, e) {
@@ -780,6 +962,36 @@
         s.style.animationDelay = (i * 50) + 'ms';
         wrap.appendChild(s);
         setTimeout(() => s.remove(), 1000);
+      }
+    }
+
+    // ============ Reward (all cards flipped) ============
+    function showReward() {
+      rewardBanner.classList.add('visible');
+      rewardBanner.setAttribute('aria-hidden', 'false');
+      shuffleBtn.classList.add('celebrate');
+      fireConfetti();
+    }
+
+    function hideReward() {
+      rewardBanner.classList.remove('visible');
+      rewardBanner.setAttribute('aria-hidden', 'true');
+      shuffleBtn.classList.remove('celebrate');
+    }
+
+    function fireConfetti() {
+      const emojis = ['🎉', '🌟', '✨', '⭐', '🎊', '💫', '🎈'];
+      for (let i = 0; i < 28; i++) {
+        setTimeout(() => {
+          const c = document.createElement('span');
+          c.className = 'confetti';
+          c.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+          c.style.left = (Math.random() * 100) + 'vw';
+          c.style.fontSize = (1.4 + Math.random() * 1.2) + 'rem';
+          c.style.animationDuration = (2 + Math.random() * 2) + 's';
+          document.body.appendChild(c);
+          setTimeout(() => c.remove(), 5000);
+        }, i * 70);
       }
     }
 
@@ -938,6 +1150,33 @@
         showGate(() => deactivateLock());
       } else {
         activateLock();
+      }
+    });
+
+    // ============ Kid-safe ecosystem ============
+    // Block right-click and iOS long-press menus
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // Block double-tap zoom which can disorient toddlers
+    let lastTap = 0;
+    document.addEventListener('touchend', e => {
+      const now = Date.now();
+      if (now - lastTap <= 300) e.preventDefault();
+      lastTap = now;
+    }, { passive: false });
+
+    // Refuse to navigate to anything off-domain
+    document.addEventListener('click', e => {
+      const link = e.target.closest('a[href]');
+      if (!link) return;
+      const href = link.getAttribute('href');
+      if (
+        /^[a-z]+:\/\//i.test(href) ||
+        href.startsWith('//') ||
+        href.startsWith('mailto:') ||
+        href.startsWith('tel:')
+      ) {
+        e.preventDefault();
       }
     });
   </script>
