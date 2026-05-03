@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Number Fun! 🔢</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-1: #FFF4E0; --bg-2: #FFE4F1; --primary: #FF6B6B;
+      --secondary: #4ECDC4; --yellow: #FFD93D; --purple: #A78BFA;
+      --green: #6BCB77; --orange: #FF9F45; --pink: #FF7AB6;
+      --blue: #4D96FF; --ink: #2D2A4A;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow-x: hidden; overscroll-behavior: none; }
+    body {
+      font-family: 'Fredoka', system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 10% 20%, var(--bg-2) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, #E0F7FA 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, #FFF9E6 0%, transparent 60%),
+        var(--bg-1);
+      min-height: 100vh; color: var(--ink); padding: 20px;
+      user-select: none; -webkit-user-select: none;
+      -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
+    }
+    body::before, body::after {
+      content: ''; position: fixed; border-radius: 50%;
+      pointer-events: none; z-index: 0;
+    }
+    body::before { top:-100px; right:-100px; width:300px; height:300px;
+      background: radial-gradient(circle, rgba(255,217,61,0.3), transparent 70%);
+      animation: float 20s ease-in-out infinite; }
+    body::after { bottom:-80px; left:-80px; width:260px; height:260px;
+      background: radial-gradient(circle, rgba(167,139,250,0.25), transparent 70%);
+      animation: float 25s ease-in-out infinite reverse; }
+    @keyframes float { 0%,100% { transform: translate(0,0); } 50% { transform: translate(30px,-20px); } }
+
+    .home-btn {
+      position: fixed; top: 18px; left: 18px; z-index: 50;
+      width: 52px; height: 52px; border: none; background: white;
+      color: var(--ink); border-radius: 16px; cursor: pointer;
+      font-size: 1.6rem; display: flex; align-items: center;
+      justify-content: center; text-decoration: none;
+      box-shadow: 0 4px 0 #D5D2C7, 0 6px 14px rgba(45,42,74,0.15);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .home-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #D5D2C7, 0 3px 8px rgba(45,42,74,0.18); }
+
+    .app { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; }
+    header { text-align: center; padding: 12px 0 24px; }
+    h1 {
+      font-family: 'Baloo 2', sans-serif;
+      font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 800;
+      line-height: 1; letter-spacing: -0.02em;
+      background: linear-gradient(90deg, var(--blue), var(--purple), var(--pink));
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent; margin-bottom: 8px;
+      transform: rotate(-1deg); display: inline-block;
+    }
+    .tagline { font-size: 1.1rem; font-weight: 500; opacity: 0.7; }
+
+    /* Number row at top */
+    .number-row {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      justify-content: center; margin-bottom: 24px;
+      padding: 12px; background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(10px);
+      border-radius: 20px; border: 3px solid white;
+    }
+    .num-pill {
+      font-family: 'Baloo 2', sans-serif; font-weight: 700;
+      width: 44px; height: 44px; border: none;
+      background: white; color: var(--ink);
+      border-radius: 12px; font-size: 1.2rem; cursor: pointer;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.08);
+      transition: all 0.15s ease;
+    }
+    .num-pill.active {
+      background: var(--ink); color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 0 #1A1830;
+    }
+    .num-pill.visited:not(.active) {
+      background: var(--green); color: white;
+    }
+    .num-pill:active { transform: translateY(2px); }
+
+    /* Main number card */
+    .main-card {
+      background: white; border-radius: 32px; padding: 32px 24px;
+      text-align: center; margin: 0 60px 24px;
+      box-shadow: 0 8px 0 rgba(0,0,0,0.08), 0 16px 32px rgba(45,42,74,0.12);
+      border: 4px solid white;
+      position: relative; overflow: hidden;
+      animation: card-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes card-in {
+      0% { opacity: 0; transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .big-number {
+      font-family: 'Baloo 2', sans-serif; font-weight: 800;
+      font-size: clamp(7rem, 24vw, 12rem); line-height: 1;
+      background: linear-gradient(135deg, var(--primary), var(--orange), var(--purple));
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent; cursor: pointer;
+      transition: transform 0.15s ease;
+      display: inline-block;
+    }
+    .big-number:active { transform: scale(0.95); }
+    .number-word {
+      font-family: 'Baloo 2', sans-serif; font-weight: 700;
+      font-size: clamp(1.6rem, 5vw, 2.4rem); color: var(--ink);
+      margin-top: -12px; margin-bottom: 24px; opacity: 0.7;
+    }
+    .counters {
+      display: flex; flex-wrap: wrap; gap: 12px;
+      justify-content: center; min-height: 80px;
+      align-items: center;
+    }
+    .counter {
+      font-size: clamp(2.4rem, 7vw, 3.5rem);
+      cursor: pointer; line-height: 1;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+      transition: transform 0.2s ease;
+      animation: bounce-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+    }
+    .counter.counted {
+      animation: count-pop 0.4s ease-out;
+    }
+    @keyframes bounce-in {
+      0% { transform: scale(0) translateY(20px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    @keyframes count-pop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.4) translateY(-15px); filter: drop-shadow(0 8px 16px rgba(255,215,61,0.6)); }
+      100% { transform: scale(1) translateY(0); }
+    }
+    .counter:active { transform: scale(0.9); }
+
+    /* Arrow buttons */
+    .nav-arrow {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 56px; height: 56px; border: none;
+      background: white; border-radius: 50%;
+      font-size: 1.8rem; cursor: pointer;
+      box-shadow: 0 4px 0 #D5D2C7, 0 6px 14px rgba(45,42,74,0.15);
+      transition: transform 0.15s ease;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--ink);
+    }
+    .nav-prev { left: 8px; }
+    .nav-next { right: 8px; }
+    .nav-arrow:active { transform: translateY(-50%) scale(0.92); }
+    .nav-arrow:disabled { opacity: 0.3; cursor: default; }
+
+    /* Reward */
+    .reward-banner {
+      position: fixed; top: 88px; left: 50%;
+      transform: translateX(-50%) translateY(-30px) scale(0.85);
+      opacity: 0; z-index: 60; pointer-events: none;
+      background: linear-gradient(135deg, #FFD93D 0%, #FF9F45 50%, #FF6B6B 100%);
+      color: white; font-family: 'Baloo 2', sans-serif;
+      padding: 18px 28px; border-radius: 24px;
+      box-shadow: 0 8px 0 rgba(199,62,92,0.3), 0 16px 40px rgba(255,107,107,0.5);
+      text-align: center; max-width: calc(100% - 32px);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      transition: opacity 0.3s ease;
+    }
+    .reward-banner.visible { opacity: 1; animation: reward-bounce 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    @keyframes reward-bounce {
+      0% { transform: translateX(-50%) translateY(-80px) scale(0.5); }
+      60% { transform: translateX(-50%) translateY(8px) scale(1.08); }
+      100% { transform: translateX(-50%) translateY(0) scale(1); }
+    }
+    .reward-main { font-size: clamp(1.3rem, 4vw, 1.8rem); font-weight: 800; line-height: 1.1; }
+    .reward-sub { font-size: clamp(0.9rem, 2.5vw, 1.05rem); font-weight: 600; margin-top: 6px; opacity: 0.95; }
+
+    .confetti { position: fixed; top: -40px; pointer-events: none; z-index: 70; animation: confetti-fall 3s linear forwards; }
+    @keyframes confetti-fall {
+      0% { transform: translateY(0) rotate(0); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    .footer-note { text-align: center; margin-top: 32px; font-size: 0.9rem; opacity: 0.5; font-weight: 500; }
+
+    @media (max-width: 600px) {
+      .home-btn { top: 12px; left: 12px; width: 46px; height: 46px; font-size: 1.4rem; }
+      .main-card { margin: 0 50px 16px; padding: 24px 16px; }
+      .nav-arrow { width: 44px; height: 44px; font-size: 1.4rem; }
+      .num-pill { width: 36px; height: 36px; font-size: 1rem; }
+      .reward-banner { top: 70px; padding: 14px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <a href="./" class="home-btn" aria-label="Home" title="Home">🏠</a>
+  <div class="app">
+    <header>
+      <h1>Number Fun!</h1>
+      <p class="tagline">Tap to count along 🎈</p>
+    </header>
+
+    <div class="number-row" id="numberRow"></div>
+
+    <div style="position: relative;">
+      <button class="nav-arrow nav-prev" id="prevBtn" aria-label="Previous">←</button>
+      <div class="main-card" id="mainCard">
+        <div class="big-number" id="bigNumber">1</div>
+        <div class="number-word" id="numberWord">One</div>
+        <div class="counters" id="counters"></div>
+      </div>
+      <button class="nav-arrow nav-next" id="nextBtn" aria-label="Next">→</button>
+    </div>
+
+    <div class="reward-banner" id="rewardBanner" aria-hidden="true">
+      <div class="reward-main">🎈 You learned all the numbers! 🎈</div>
+      <div class="reward-sub">Tap any number to keep playing!</div>
+    </div>
+    <p class="footer-note">Made with 💛 for little learners</p>
+  </div>
+
+  <script>
+    const words = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
+    const counterEmojis = ['🎈','⭐','🍎','🐶','🌟','🎁','🍓','🦋','🚂','🌻'];
+    let current = 1;
+    const visited = new Set();
+    let rewardShown = false;
+
+    let preferredVoice = null;
+    function loadVoices() {
+      const voices = speechSynthesis.getVoices();
+      if (!voices.length) return;
+      const en = voices.filter(v => v.lang.startsWith('en'));
+      preferredVoice = en.find(v => /samantha|karen|tessa|fiona|moira|female/i.test(v.name))
+        || en.find(v => /google.*us english/i.test(v.name)) || en[0] || voices[0];
+    }
+    if ('speechSynthesis' in window) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+    function speak(text, opts = {}) {
+      if (!('speechSynthesis' in window)) return;
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = opts.rate || 0.9; u.pitch = opts.pitch || 1.15; u.volume = 1;
+      if (preferredVoice) u.voice = preferredVoice;
+      setTimeout(() => speechSynthesis.speak(u), 50);
+    }
+
+    const numberRow = document.getElementById('numberRow');
+    const bigNumber = document.getElementById('bigNumber');
+    const numberWord = document.getElementById('numberWord');
+    const counters = document.getElementById('counters');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const rewardBanner = document.getElementById('rewardBanner');
+
+    function renderNumberRow() {
+      numberRow.innerHTML = '';
+      for (let i = 1; i <= 10; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'num-pill';
+        if (i === current) btn.classList.add('active');
+        if (visited.has(i)) btn.classList.add('visited');
+        btn.textContent = i;
+        btn.addEventListener('click', () => goTo(i));
+        numberRow.appendChild(btn);
+      }
+    }
+
+    function renderMain() {
+      bigNumber.textContent = current;
+      numberWord.textContent = words[current];
+      // Pick a counter emoji that rotates per number
+      const emoji = counterEmojis[(current - 1) % counterEmojis.length];
+      counters.innerHTML = '';
+      for (let i = 0; i < current; i++) {
+        const c = document.createElement('span');
+        c.className = 'counter';
+        c.textContent = emoji;
+        c.style.animationDelay = (i * 70) + 'ms';
+        c.dataset.index = i + 1;
+        c.addEventListener('click', () => countOne(c, i + 1));
+        counters.appendChild(c);
+      }
+      prevBtn.disabled = current === 1;
+      nextBtn.disabled = current === 10;
+    }
+
+    function countOne(el, n) {
+      el.classList.remove('counted');
+      void el.offsetWidth;
+      el.classList.add('counted');
+      speak(words[n]);
+    }
+
+    function goTo(n) {
+      current = n;
+      visited.add(n);
+      renderNumberRow();
+      renderMain();
+      speak(words[n]);
+      checkReward();
+    }
+
+    function checkReward() {
+      if (!rewardShown && visited.size === 10) {
+        rewardShown = true;
+        showReward();
+      }
+    }
+
+    function showReward() {
+      rewardBanner.classList.add('visible');
+      rewardBanner.setAttribute('aria-hidden', 'false');
+      fireConfetti();
+      setTimeout(() => speak('Wonderful counting!', { pitch: 1.3, rate: 0.95 }), 1000);
+    }
+
+    function fireConfetti() {
+      const emojis = ['🎉','🌟','✨','⭐','🎊','💫','🎈'];
+      for (let i = 0; i < 28; i++) {
+        setTimeout(() => {
+          const c = document.createElement('span');
+          c.className = 'confetti';
+          c.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+          c.style.left = (Math.random()*100) + 'vw';
+          c.style.fontSize = (1.4 + Math.random()*1.2) + 'rem';
+          c.style.animationDuration = (2 + Math.random()*2) + 's';
+          document.body.appendChild(c);
+          setTimeout(() => c.remove(), 5000);
+        }, i*70);
+      }
+    }
+
+    bigNumber.addEventListener('click', () => speak(words[current]));
+    prevBtn.addEventListener('click', () => current > 1 && goTo(current - 1));
+    nextBtn.addEventListener('click', () => current < 10 && goTo(current + 1));
+
+    visited.add(1);
+    renderNumberRow();
+    renderMain();
+
+    // Kid-safe ecosystem
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    let lastTap = 0;
+    document.addEventListener('touchend', e => {
+      const now = Date.now();
+      if (now - lastTap <= 300) e.preventDefault();
+      lastTap = now;
+    }, { passive: false });
+    document.addEventListener('click', e => {
+      const link = e.target.closest('a[href]');
+      if (!link) return;
+      const href = link.getAttribute('href');
+      if (/^[a-z]+:\/\//i.test(href) || href.startsWith('//') || href.startsWith('mailto:') || href.startsWith('tel:')) {
+        e.preventDefault();
+      }
+    });
+  </script>
+</body>
+</html>

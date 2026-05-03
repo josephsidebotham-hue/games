@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Math Fun! ➕</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-1: #FFF4E0; --bg-2: #FFE4F1; --primary: #FF6B6B;
+      --secondary: #4ECDC4; --yellow: #FFD93D; --purple: #A78BFA;
+      --green: #6BCB77; --orange: #FF9F45; --pink: #FF7AB6;
+      --blue: #4D96FF; --ink: #2D2A4A;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow-x: hidden; overscroll-behavior: none; }
+    body {
+      font-family: 'Fredoka', system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 10% 20%, var(--bg-2) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, #E0F7FA 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, #FFF9E6 0%, transparent 60%),
+        var(--bg-1);
+      min-height: 100vh; color: var(--ink); padding: 20px;
+      user-select: none; -webkit-user-select: none;
+      -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
+    }
+    body::before, body::after { content: ''; position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; }
+    body::before { top:-100px; right:-100px; width:300px; height:300px;
+      background: radial-gradient(circle, rgba(255,217,61,0.3), transparent 70%);
+      animation: float 20s ease-in-out infinite; }
+    body::after { bottom:-80px; left:-80px; width:260px; height:260px;
+      background: radial-gradient(circle, rgba(167,139,250,0.25), transparent 70%);
+      animation: float 25s ease-in-out infinite reverse; }
+    @keyframes float { 0%,100% { transform: translate(0,0); } 50% { transform: translate(30px,-20px); } }
+
+    .home-btn {
+      position: fixed; top: 18px; left: 18px; z-index: 50;
+      width: 52px; height: 52px; border: none; background: white;
+      color: var(--ink); border-radius: 16px; cursor: pointer;
+      font-size: 1.6rem; display: flex; align-items: center;
+      justify-content: center; text-decoration: none;
+      box-shadow: 0 4px 0 #D5D2C7, 0 6px 14px rgba(45,42,74,0.15);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .home-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #D5D2C7, 0 3px 8px rgba(45,42,74,0.18); }
+
+    .app { max-width: 800px; margin: 0 auto; position: relative; z-index: 1; }
+    header { text-align: center; padding: 12px 0 24px; }
+    h1 {
+      font-family: 'Baloo 2', sans-serif;
+      font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 800;
+      line-height: 1; letter-spacing: -0.02em;
+      background: linear-gradient(90deg, var(--green), var(--blue), var(--purple));
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent; margin-bottom: 8px;
+      transform: rotate(-1deg); display: inline-block;
+    }
+    .tagline { font-size: 1.1rem; font-weight: 500; opacity: 0.7; }
+
+    /* Mode toggle */
+    .mode-toggle {
+      display: flex; justify-content: center; gap: 8px;
+      margin-bottom: 24px; padding: 6px;
+      background: white; border-radius: 18px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+      width: fit-content; margin-left: auto; margin-right: auto;
+    }
+    .mode-btn {
+      font-family: 'Baloo 2', sans-serif; font-weight: 700;
+      padding: 10px 20px; border: none; background: transparent;
+      color: var(--ink); cursor: pointer; border-radius: 12px;
+      font-size: 1.1rem; transition: all 0.15s ease;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .mode-btn.active {
+      background: var(--ink); color: white;
+      box-shadow: 0 4px 12px rgba(45,42,74,0.25);
+    }
+
+    /* Equation card */
+    .equation-card {
+      background: white; border-radius: 32px;
+      padding: 28px 20px; margin-bottom: 20px;
+      box-shadow: 0 8px 0 rgba(0,0,0,0.08), 0 16px 32px rgba(45,42,74,0.12);
+      border: 4px solid white;
+      animation: card-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes card-in {
+      0% { opacity: 0; transform: scale(0.9) translateY(20px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* Big formula at top of card */
+    .formula {
+      display: flex; align-items: center; justify-content: center;
+      gap: clamp(8px, 2vw, 18px); margin-bottom: 24px;
+      font-family: 'Baloo 2', sans-serif; font-weight: 800;
+      font-size: clamp(2.4rem, 9vw, 4.5rem);
+      line-height: 1; flex-wrap: wrap;
+    }
+    .num {
+      min-width: clamp(60px, 14vw, 90px); height: clamp(70px, 16vw, 110px);
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      color: white; border-radius: 20px;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.15), 0 8px 16px rgba(77,150,255,0.3);
+      cursor: pointer; padding: 0 12px;
+      transition: transform 0.15s ease;
+    }
+    .num:active { transform: scale(0.95); }
+    .num.answer {
+      background: linear-gradient(135deg, var(--orange), var(--primary));
+      box-shadow: 0 4px 0 rgba(0,0,0,0.15), 0 8px 16px rgba(255,107,107,0.3);
+    }
+    .num.answer.hidden {
+      animation: pulse-q 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse-q {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); box-shadow: 0 4px 0 rgba(0,0,0,0.15), 0 12px 24px rgba(255,217,61,0.5); }
+    }
+    .num.answer.revealing {
+      animation: reveal-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes reveal-pop {
+      0% { transform: scale(1) rotate(0); }
+      40% { transform: scale(1.3) rotate(8deg); }
+      70% { transform: scale(0.9) rotate(-4deg); }
+      100% { transform: scale(1) rotate(0); }
+    }
+    .op {
+      color: var(--ink); opacity: 0.6;
+      font-size: clamp(2rem, 7vw, 3.5rem);
+    }
+
+    /* Animal counting groups */
+    .groups {
+      display: flex; flex-direction: column; gap: 16px;
+      align-items: center;
+    }
+    .group-row {
+      display: flex; align-items: center; gap: 12px;
+      flex-wrap: wrap; justify-content: center;
+      width: 100%;
+    }
+    .group-label {
+      font-family: 'Baloo 2', sans-serif; font-weight: 700;
+      font-size: 1.4rem; min-width: 36px;
+      text-align: right; color: var(--ink); opacity: 0.7;
+    }
+    .group {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      justify-content: center; align-items: center;
+      flex: 1; min-height: 60px;
+    }
+    .animal {
+      font-size: clamp(2rem, 6vw, 2.8rem); line-height: 1;
+      cursor: pointer;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.15));
+      transition: transform 0.2s ease;
+      animation: animal-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+    }
+    .animal.counted {
+      animation: count-pop 0.4s ease-out;
+    }
+    @keyframes animal-in {
+      0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+      100% { transform: scale(1) rotate(0); opacity: 1; }
+    }
+    @keyframes count-pop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.4) translateY(-12px); filter: drop-shadow(0 8px 16px rgba(255,215,61,0.6)); }
+      100% { transform: scale(1) translateY(0); }
+    }
+    .answer-group .animal { animation: reveal-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
+    @keyframes reveal-bounce {
+      0% { transform: scale(0) translateY(-30px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    .op-label {
+      font-family: 'Baloo 2', sans-serif; font-weight: 800;
+      font-size: 1.6rem; color: var(--ink); opacity: 0.5;
+      margin: 4px 0;
+    }
+
+    /* Action buttons */
+    .actions {
+      display: flex; gap: 12px; justify-content: center;
+      margin-top: 24px;
+    }
+    .action-btn {
+      font-family: 'Baloo 2', sans-serif; font-weight: 700;
+      padding: 14px 24px; border: none; border-radius: 18px;
+      cursor: pointer; font-size: 1.1rem;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .reveal-btn {
+      background: linear-gradient(135deg, var(--yellow), var(--orange));
+      color: var(--ink);
+      box-shadow: 0 5px 0 #C7841C;
+    }
+    .reveal-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #C7841C; }
+    .next-btn {
+      background: linear-gradient(135deg, var(--green), var(--secondary));
+      color: white;
+      box-shadow: 0 5px 0 #3D8C44;
+    }
+    .next-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #3D8C44; }
+    .next-btn:disabled, .reveal-btn:disabled { opacity: 0.4; pointer-events: none; }
+
+    .footer-note { text-align: center; margin-top: 32px; font-size: 0.9rem; opacity: 0.5; font-weight: 500; }
+
+    /* Mini sparkles on reveal */
+    .sparkle { position: absolute; pointer-events: none; animation: sparkle-fly 0.8s ease-out forwards; font-size: 1.6rem; z-index: 10; }
+    @keyframes sparkle-fly {
+      0% { transform: scale(0) rotate(0); opacity: 1; }
+      50% { transform: scale(1.4) rotate(180deg); opacity: 1; }
+      100% { transform: scale(0.5) rotate(360deg) translateY(-40px); opacity: 0; }
+    }
+
+    @media (max-width: 600px) {
+      .home-btn { top: 12px; left: 12px; width: 46px; height: 46px; font-size: 1.4rem; }
+      .equation-card { padding: 20px 12px; }
+      .formula { gap: 6px; }
+      .group-label { font-size: 1.1rem; min-width: 28px; }
+      .actions { flex-direction: column; }
+      .action-btn { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <a href="./" class="home-btn" aria-label="Home" title="Home">🏠</a>
+  <div class="app">
+    <header>
+      <h1>Math Fun!</h1>
+      <p class="tagline">Tap the ❓ to see the answer ✨</p>
+    </header>
+
+    <div class="mode-toggle">
+      <button class="mode-btn active" data-mode="add">➕ Add</button>
+      <button class="mode-btn" data-mode="sub">➖ Subtract</button>
+    </div>
+
+    <div class="equation-card" id="card">
+      <div class="formula" id="formula"></div>
+      <div class="groups" id="groups"></div>
+    </div>
+
+    <div class="actions">
+      <button class="action-btn reveal-btn" id="revealBtn">✨ Show Answer</button>
+      <button class="action-btn next-btn" id="nextBtn">🎲 New Problem</button>
+    </div>
+
+    <p class="footer-note">Made with 💛 for little learners</p>
+  </div>
+
+  <script>
+    const wordNumbers = ['zero','one','two','three','four','five','six','seven','eight','nine','ten'];
+    const animalPool = ['🐶','🐱','🐮','🐷','🦆','🐰','🐻','🦊','🐸','🦋','🐝','🐔'];
+
+    let state = {
+      mode: 'add',
+      a: 0, b: 0, answer: 0,
+      animal: '🐶',
+      revealed: false
+    };
+
+    let preferredVoice = null;
+    function loadVoices() {
+      const voices = speechSynthesis.getVoices();
+      if (!voices.length) return;
+      const en = voices.filter(v => v.lang.startsWith('en'));
+      preferredVoice = en.find(v => /samantha|karen|tessa|fiona|moira|female/i.test(v.name))
+        || en.find(v => /google.*us english/i.test(v.name)) || en[0] || voices[0];
+    }
+    if ('speechSynthesis' in window) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+    function speak(text, opts = {}) {
+      if (!('speechSynthesis' in window)) return;
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = opts.rate || 0.9; u.pitch = opts.pitch || 1.15; u.volume = 1;
+      if (preferredVoice) u.voice = preferredVoice;
+      if (opts.onend) u.onend = opts.onend;
+      setTimeout(() => speechSynthesis.speak(u), 50);
+    }
+
+    const formula = document.getElementById('formula');
+    const groups = document.getElementById('groups');
+    const revealBtn = document.getElementById('revealBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function newProblem() {
+      let a, b;
+      if (state.mode === 'add') {
+        // a + b < 10, both >= 1
+        do {
+          a = Math.floor(Math.random() * 8) + 1; // 1-8
+          b = Math.floor(Math.random() * (9 - a)) + 1; // ensures a+b <= 9
+        } while (a + b > 9);
+        state.a = a; state.b = b; state.answer = a + b;
+      } else {
+        // a - b, a >= b, a < 10, b >= 1
+        a = Math.floor(Math.random() * 8) + 2; // 2-9
+        b = Math.floor(Math.random() * a) + 1; // 1-(a-0), at least 1, at most a
+        if (b > a) b = a;
+        state.a = a; state.b = b; state.answer = a - b;
+      }
+      state.animal = animalPool[Math.floor(Math.random() * animalPool.length)];
+      state.revealed = false;
+      render();
+    }
+
+    function render() {
+      const op = state.mode === 'add' ? '+' : '−';
+      const opLabel = state.mode === 'add' ? 'plus' : 'minus';
+
+      formula.innerHTML = `
+        <div class="num" data-speak="${state.a}">${state.a}</div>
+        <div class="op">${op}</div>
+        <div class="num" data-speak="${state.b}">${state.b}</div>
+        <div class="op">=</div>
+        <div class="num answer ${state.revealed ? '' : 'hidden'}" id="answerNum" data-speak="${state.answer}">${state.revealed ? state.answer : '?'}</div>
+      `;
+
+      groups.innerHTML = `
+        <div class="group-row">
+          <div class="group-label">${state.a}</div>
+          <div class="group" id="groupA"></div>
+        </div>
+        <div class="op-label">${opLabel}</div>
+        <div class="group-row">
+          <div class="group-label">${state.b}</div>
+          <div class="group" id="groupB"></div>
+        </div>
+        <div class="op-label">equals</div>
+        <div class="group-row">
+          <div class="group-label">${state.revealed ? state.answer : '?'}</div>
+          <div class="group answer-group" id="groupAnswer"></div>
+        </div>
+      `;
+
+      const groupA = document.getElementById('groupA');
+      const groupB = document.getElementById('groupB');
+      const groupAnswer = document.getElementById('groupAnswer');
+
+      addAnimals(groupA, state.a);
+      addAnimals(groupB, state.b);
+      if (state.revealed) {
+        addAnimals(groupAnswer, state.answer, true);
+      } else {
+        groupAnswer.innerHTML = '<span style="font-size: 2rem; opacity: 0.3;">❓</span>';
+      }
+
+      // wire up the formula numbers and answer
+      formula.querySelectorAll('.num').forEach(n => {
+        n.addEventListener('click', () => {
+          if (n.classList.contains('answer') && !state.revealed) {
+            revealAnswer();
+          } else if (n.classList.contains('answer') && state.revealed) {
+            speak(wordNumbers[state.answer]);
+          } else {
+            speak(wordNumbers[parseInt(n.dataset.speak, 10)]);
+          }
+        });
+      });
+
+      revealBtn.disabled = state.revealed;
+    }
+
+    function addAnimals(container, n, isAnswer = false) {
+      container.innerHTML = '';
+      for (let i = 0; i < n; i++) {
+        const a = document.createElement('span');
+        a.className = 'animal';
+        a.textContent = state.animal;
+        a.style.animationDelay = (i * 50) + 'ms';
+        a.dataset.index = i + 1;
+        a.addEventListener('click', () => {
+          a.classList.remove('counted');
+          void a.offsetWidth;
+          a.classList.add('counted');
+          speak(wordNumbers[i + 1]);
+        });
+        container.appendChild(a);
+      }
+    }
+
+    function revealAnswer() {
+      if (state.revealed) return;
+      state.revealed = true;
+      render();
+      const answerEl = document.getElementById('answerNum');
+      answerEl.classList.add('revealing');
+      sparkleAt(answerEl);
+
+      // Speak the full equation result
+      const op = state.mode === 'add' ? 'plus' : 'minus';
+      const sentence = `${wordNumbers[state.a]} ${op} ${wordNumbers[state.b]} equals ${wordNumbers[state.answer]}!`;
+      setTimeout(() => speak(sentence, { pitch: 1.2, rate: 0.85 }), 200);
+    }
+
+    function sparkleAt(el) {
+      const emojis = ['✨','⭐','💫','🌟'];
+      const rect = el.getBoundingClientRect();
+      const cardRect = document.getElementById('card').getBoundingClientRect();
+      const x = rect.left + rect.width/2 - cardRect.left;
+      const y = rect.top + rect.height/2 - cardRect.top;
+      const card = document.getElementById('card');
+      card.style.position = 'relative';
+      for (let i = 0; i < 6; i++) {
+        const s = document.createElement('span');
+        s.className = 'sparkle';
+        s.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+        s.style.left = (x + (Math.random()-0.5)*100) + 'px';
+        s.style.top = (y + (Math.random()-0.5)*100) + 'px';
+        s.style.animationDelay = (i*60) + 'ms';
+        card.appendChild(s);
+        setTimeout(() => s.remove(), 1000);
+      }
+    }
+
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.mode = btn.dataset.mode;
+        newProblem();
+      });
+    });
+
+    revealBtn.addEventListener('click', revealAnswer);
+    nextBtn.addEventListener('click', newProblem);
+
+    newProblem();
+
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    let lastTap = 0;
+    document.addEventListener('touchend', e => {
+      const now = Date.now();
+      if (now - lastTap <= 300) e.preventDefault();
+      lastTap = now;
+    }, { passive: false });
+    document.addEventListener('click', e => {
+      const link = e.target.closest('a[href]');
+      if (!link) return;
+      const href = link.getAttribute('href');
+      if (/^[a-z]+:\/\//i.test(href) || href.startsWith('//') || href.startsWith('mailto:') || href.startsWith('tel:')) {
+        e.preventDefault();
+      }
+    });
+  </script>
+</body>
+</html>
